@@ -36,7 +36,7 @@ interface ToDoDao {
     suspend fun deleteTask(toDoTask: ToDoTask)
 
     @Query("DELETE FROM todo_table")
-    suspend fun deleteAllTask()
+    suspend fun deleteAllTasks()
 
     /** LIKE - functions like contains */
     @Query("SELECT * FROM todo_table WHERE title LIKE :searchQuery OR description LIKE :searchQuery")
