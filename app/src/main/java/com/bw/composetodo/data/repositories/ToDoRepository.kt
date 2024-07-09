@@ -6,7 +6,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-/** will be alive for as long as SharedViewModel */
+/** Dagger Hilt : will be alive for as long as SharedViewModel */
 @ViewModelScoped
 class ToDoRepository @Inject constructor(private val toDoDao: ToDoDao) {
 

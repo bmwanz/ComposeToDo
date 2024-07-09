@@ -13,10 +13,12 @@ import javax.inject.Inject
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     private val repository: ToDoRepository
-): ViewModel() {
+) : ViewModel() {
 
-    private val _allTasks = MutableStateFlow<List<ToDoTask>>(emptyList())
-    val allTasks: StateFlow<List<ToDoTask>> = _allTasks /** publicly exposed for composable */
+    private val _allTasks =
+        MutableStateFlow<List<ToDoTask>>(emptyList())
+    /** publicly exposed for composable */
+    val allTasks: StateFlow<List<ToDoTask>> = _allTasks
 
     fun getAllTasks() {
         viewModelScope.launch {
