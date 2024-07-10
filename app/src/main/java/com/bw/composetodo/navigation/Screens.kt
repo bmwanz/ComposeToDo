@@ -19,6 +19,7 @@ class Screens(navController: NavHostController) {
 
     // list -> task, pass ID
     // request task from db
+    // top task bar depends on Int
     val task: (Int) -> Unit = { taskId ->
         navController.navigate(route = "task/$taskId")
     }
