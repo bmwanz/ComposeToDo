@@ -28,9 +28,9 @@ fun ListScreen(
             )
         },
         floatingActionButton = {
-            ListFab {
-                navigateToTaskScreen
-            }
+            ListFab (
+                onFabClicked = navigateToTaskScreen
+            )
         }
 
     )
@@ -38,13 +38,13 @@ fun ListScreen(
 
 @Composable
 fun ListFab(
-    navigateToTaskScreen: (Int) -> Unit
+    onFabClicked: (Int) -> Unit
 ) {
     FloatingActionButton(
         onClick = {
             // navigate to task composable
             // not selecting any task, -1
-            navigateToTaskScreen(-1)
+            onFabClicked(-1)
         }) {
         Icon(
             // Add represents + symbol
