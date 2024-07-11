@@ -20,7 +20,7 @@ fun ListScreen(
 ) {
     Scaffold(
         topBar = {
-
+            ListAppBar()
         },
         content = {
             // temporary to satisfy padding
