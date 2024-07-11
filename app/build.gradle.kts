@@ -28,10 +28,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro"
-//            )
         }
     }
     compileOptions {
@@ -63,7 +59,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation("com.google.android.material:material:1.12.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,6 +69,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation("androidx.multidex:multidex:2.0.1")
+
+    // Compose
+    implementation("androidx.compose.material:material:1.6.8")
+    implementation("androidx.compose.ui:ui:1.6.8")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.8")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.8")
+
 
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
@@ -88,6 +92,7 @@ dependencies {
     // Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.46")
     kapt("com.google.dagger:hilt-compiler:2.46")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
     // Splash API
     implementation("androidx.core:core-splashscreen:1.0.1")
