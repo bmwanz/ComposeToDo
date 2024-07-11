@@ -11,7 +11,7 @@ import com.bw.composetodo.util.Constants.LIST_SCREEN
 // extension function
 fun NavGraphBuilder.listComposable(
     // lambda containing int for list composable
-    navigateToTaskScreen: (Int) -> Unit
+    navigateToTaskScreen: (taskId: Int) -> Unit
 ) {
     composable(
         route = LIST_SCREEN,
