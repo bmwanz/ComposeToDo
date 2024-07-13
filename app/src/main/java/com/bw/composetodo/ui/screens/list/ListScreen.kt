@@ -1,5 +1,6 @@
 package com.bw.composetodo.ui.screens.list
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -37,12 +38,11 @@ fun ListScreen(
             )
         },
         content = {
-            // temporary to satisfy padding
-                paddingValues ->
-            Text(
-                text = "",
-                Modifier.padding(paddingValues)
-            )
+            /**
+                https://stackoverflow.com/questions/72084865/content-padding-parameter-it-is-not-used
+             */
+            it
+            ListContent()
         },
         floatingActionButton = {
             ListFab(
@@ -60,7 +60,8 @@ fun ListFab(
     FloatingActionButton(
         onClick = {
             // navigate to task composable
-            // not selecting any task, -1
+            // not opening any existing task, -1
+            // creating new task
             onFabClicked(-1)
         },
         backgroundColor = MaterialTheme.colors.fabBackgroundColor
