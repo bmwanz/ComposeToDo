@@ -41,21 +41,48 @@ import com.bw.composetodo.ui.theme.TOP_APP_BAR_HEIGHT
 import com.bw.composetodo.ui.theme.Typography
 import com.bw.composetodo.ui.theme.topAppBarBackgroundColor
 import com.bw.composetodo.ui.theme.topAppBarContentColor
+import com.bw.composetodo.ui.viewmodels.SharedViewModel
+import com.bw.composetodo.util.SearchAppBarState
+import com.bw.composetodo.util.TrailingIconState
 
 @Composable
-fun ListAppBar() {
-//    DefaultListAppBar(
-//        onSearchClicked = {},
-//        onSortClicked = {},
-//        onDeleteClicked = {}
-//    )
+fun ListAppBar(
+    sharedViewModel: SharedViewModel,
+    searchAppBarState: SearchAppBarState,
+    searchTextState: String
+) {
+    when (searchAppBarState) {
+        SearchAppBarState.CLOSED -> {
+            DefaultListAppBar(
+                onSearchClicked = {
+                    // ListScreen observing this value, when it changes,
+                    // will recompose ListAppBar in ListScreen L33,
+                    // will go to else -> SearchAppBar below
+                    sharedViewModel.searchAppBarState.value = SearchAppBarState.OPENED
+                },
+                onSortClicked = {},
+                onDeleteClicked = {}
+            )
+        }
 
-    SearchAppBar(
-        text = "",
-        onTextChanged = {},
-        onCloseClicked = {},
-        onSearchClicked = {}
-    )
+        else -> {
+            SearchAppBar(
+                // default initial value already empty string
+                // sharedViewModel L25
+                text = searchTextState,
+                onTextChanged = { newText ->
+                    // recompose, mutable state
+                    sharedViewModel.searchTextState.value = newText
+                },
+                onCloseClicked = {
+                    // recompose to closed and reset text
+                    sharedViewModel.searchAppBarState.value = SearchAppBarState.CLOSED
+                    sharedViewModel.searchTextState.value = ""
+                },
+                onSearchClicked = {}
+            )
+        }
+    }
 }
 
 @Composable
@@ -205,6 +232,11 @@ fun SearchAppBar(
     onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit
 ) {
+
+    var trailingIconState by remember {
+        mutableStateOf(TrailingIconState.READY_TO_DELETE)
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -244,7 +276,26 @@ fun SearchAppBar(
             },
             trailingIcon = {
                 IconButton(
-                    onClick = { onCloseClicked() }
+                    onClick = {
+                        // TODO: bug, open search, keep empty, try to close
+                        when(trailingIconState) {
+                            // first click empty text, ready to close search bar
+                            TrailingIconState.READY_TO_DELETE -> {
+                                onTextChanged("")
+                                trailingIconState = TrailingIconState.READY_TO_CLOSE
+                            }
+                            // second click
+                            TrailingIconState.READY_TO_CLOSE -> {
+                                if (text.isNotEmpty()) {
+                                    onTextChanged("")
+                                } else {
+                                    // only close if it's actually empty
+                                    onCloseClicked()
+                                    trailingIconState = TrailingIconState.READY_TO_DELETE
+                                }
+                            }
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
