@@ -1,5 +1,6 @@
 package com.bw.composetodo.navigation.destinations
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.navigation.compose.composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -9,6 +10,7 @@ import com.bw.composetodo.ui.viewmodels.SharedViewModel
 import com.bw.composetodo.util.Constants.LIST_ARGUMENT_KEY
 import com.bw.composetodo.util.Constants.LIST_SCREEN
 
+@ExperimentalMaterialApi
 // extension function
 fun NavGraphBuilder.listComposable(
     // lambda containing int for list composable
