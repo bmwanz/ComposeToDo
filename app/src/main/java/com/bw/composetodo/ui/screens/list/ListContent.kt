@@ -29,20 +29,29 @@ import com.bw.composetodo.ui.theme.PRIORITY_INDICATOR_SIZE
 import com.bw.composetodo.ui.theme.TASK_ITEM_ELEVATION
 import com.bw.composetodo.ui.theme.taskItemBackgroundColor
 import com.bw.composetodo.ui.theme.taskItemTextColor
+import com.bw.composetodo.util.RequestState
 
 @ExperimentalMaterialApi
 @Composable
 fun ListContent(
-    tasks: List<ToDoTask>,
+    tasks: RequestState<List<ToDoTask>>,
     navigateToTaskScreen: (taskId: Int) -> Unit
 ) {
-    if (tasks.isEmpty()) {
-        EmptyContent()
-    } else {
-        DisplayTasks(
-            tasks = tasks,
-            navigateToTaskScreen = navigateToTaskScreen
-        )
+    /**
+        show content only if RequestState is success
+        success only returned when data is collected from repository
+            SharedViewModel.getAllTasks L36
+        otherwise state will be loading or idle (if first time launch)
+     */
+    if (tasks is RequestState.Success) {
+        if (tasks.data.isEmpty()) {
+            EmptyContent()
+        } else {
+            DisplayTasks(
+                tasks = tasks.data,
+                navigateToTaskScreen = navigateToTaskScreen
+            )
+        }
     }
 }
 
