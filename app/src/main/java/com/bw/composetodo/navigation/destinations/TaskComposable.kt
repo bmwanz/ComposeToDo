@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.bw.composetodo.ui.screens.task.TaskScreen
 import com.bw.composetodo.util.Action
 import com.bw.composetodo.util.Constants.TASK_ARGUMENT_KEY
 import com.bw.composetodo.util.Constants.TASK_SCREEN
@@ -19,7 +20,9 @@ fun NavGraphBuilder.taskComposable(
             type = NavType.IntType
         })
     ) { navBackStackEntry ->
+        /** android dev documentation: shouldn't put whole objects into arguments */
         val taskId = navBackStackEntry.arguments!!.getInt(TASK_ARGUMENT_KEY)
 
+        TaskScreen(navigateToListScreen = navigateToListScreen)
     }
 }
