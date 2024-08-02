@@ -31,6 +31,11 @@ fun ListScreen(
         sharedViewModel.getAllTasks()
     }
 
+    /** observe changes to sharedViewModelAction, changed in ListComposable LaunchEffect,
+        pass into `handleDatabaseActions`
+      */
+    val action by sharedViewModel.action
+
     // collects value from state flow, updates whenever there is change in database
     // basically observing database
     // `by` to transfer state into list of ToDoTasks
@@ -39,6 +44,8 @@ fun ListScreen(
     // observe appBarState from sharedViewModel
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppBarState
     val searchTextState: String by sharedViewModel.searchTextState
+
+    sharedViewModel.handleDatabaseActions(action = action)
 
     Scaffold(
         topBar = {
