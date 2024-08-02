@@ -45,8 +45,9 @@ fun NavGraphBuilder.taskComposable(
          */
         val selectedTask by sharedViewModel.selectedTask.collectAsState()
 
-        // whenever taskId above changes, launched effect triggers
-        LaunchedEffect(key1 = taskId) {
+        // whenever selectedTask above changes, launched effect triggers
+        // use selectedTask - race condition, view may retain previous task
+        LaunchedEffect(key1 = selectedTask) {
             sharedViewModel.updateTaskFields(selectedTask)
         }
         
