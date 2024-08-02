@@ -124,7 +124,7 @@ fun DisplaySnackBar(
 
     val scope = rememberCoroutineScope()
 
-    // whenever action changes, display snackbar
+    // whenever action changes, display snack bar
     LaunchedEffect(key1 = action) {
         if (action != Action.NO_ACTION) {
             scope.launch {

@@ -22,7 +22,7 @@ interface ToDoDao {
 
     /**
         will run in coroutine, need suspend
-        above use Flow, already running asynch by default, no need for suspend
+        above use Flow, already running async by default, no need for suspend
 
         On conflict of ID's, ignore
      */
