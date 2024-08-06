@@ -6,6 +6,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
@@ -36,9 +37,10 @@ fun ListScreen(
         sharedViewModel.getAllTasks()
     }
 
-    /** observe changes to sharedViewModelAction, changed in ListComposable LaunchEffect,
-        pass into `handleDatabaseActions`
-      */
+    /**
+    observe changes to sharedViewModelAction, changed in ListComposable LaunchEffect,
+    pass into `handleDatabaseActions`
+     */
     val action by sharedViewModel.action
 
     // collects value from state flow, updates whenever there is change in database
@@ -52,10 +54,13 @@ fun ListScreen(
 
     val scaffoldState = rememberScaffoldState()
 
-//    sharedViewModel.handleDatabaseActions(action = action)
     DisplaySnackBar(
         scaffoldState = scaffoldState,
         handleDatabaseActions = { sharedViewModel.handleDatabaseActions(action = action) },
+        onUndoClick = {
+            // update action to "undo" in undoDeletedTask
+           sharedViewModel.action.value = it
+        },
         taskTitle = sharedViewModel.title.value,
         action = action
     )
@@ -71,7 +76,7 @@ fun ListScreen(
         },
         content = {
             /**
-                https://stackoverflow.com/questions/72084865/content-padding-parameter-it-is-not-used
+            https://stackoverflow.com/questions/72084865/content-padding-parameter-it-is-not-used
              */
             it
             ListContent(
@@ -116,6 +121,7 @@ fun ListFab(
 fun DisplaySnackBar(
     scaffoldState: ScaffoldState,
     handleDatabaseActions: () -> Unit,
+    onUndoClick: (Action) -> Unit,
     taskTitle: String,
     action: Action
 ) {
@@ -124,16 +130,41 @@ fun DisplaySnackBar(
 
     val scope = rememberCoroutineScope()
 
-    // whenever action changes, display snack bar
+    /** whenever action changes, display snack bar */
     LaunchedEffect(key1 = action) {
         if (action != Action.NO_ACTION) {
             scope.launch {
-                val snackbarResult = scaffoldState.snackbarHostState.showSnackbar(
+                val snackBarResult = scaffoldState.snackbarHostState.showSnackbar(
                     message = "${action.name}: $taskTitle",
-                    actionLabel = "OK"
+                    actionLabel = setActionLabel(action)
+                )
+                undoDeletedTask(
+                    action = action,
+                    snackBarResult = snackBarResult,
+                    onUndoClick = onUndoClick
                 )
             }
         }
+    }
+}
+
+private fun setActionLabel(action: Action): String {
+    return if (action.name == "DELETE") {
+        "UNDO"
+    } else {
+        "OK"
+    }
+}
+
+private fun undoDeletedTask(
+    action: Action,
+    snackBarResult: SnackbarResult,
+    onUndoClick: (Action) -> Unit
+) {
+    if (snackBarResult == SnackbarResult.ActionPerformed &&
+        action == Action.DELETE
+    ) {
+        onUndoClick(Action.UNDO)
     }
 }
 

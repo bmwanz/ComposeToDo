@@ -48,7 +48,11 @@ fun NavGraphBuilder.taskComposable(
         // whenever selectedTask above changes, launched effect triggers
         // use selectedTask - race condition, view may retain previous task
         LaunchedEffect(key1 = selectedTask) {
-            sharedViewModel.updateTaskFields(selectedTask)
+            // do not update task fields if deleted
+            // cause bug for undo deleted task
+            if (selectedTask != null || taskId == -1) {
+                sharedViewModel.updateTaskFields(selectedTask)
+            }
         }
         
         TaskScreen(
