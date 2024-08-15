@@ -37,7 +37,11 @@ fun NavGraphBuilder.taskComposable(
             navBackStackEntry ->
         /** android dev documentation: shouldn't put whole objects into arguments */
         val taskId = navBackStackEntry.arguments!!.getInt(TASK_ARGUMENT_KEY)
-        sharedViewModel.getSelectedTask(taskId = taskId)
+
+        /** shouldn't call functions that change state of app directly in composable, call in a LaunchedEffect */
+        LaunchedEffect(key1 = taskId) {
+            sharedViewModel.getSelectedTask(taskId = taskId)
+        }
 
         /**
         observe value,
