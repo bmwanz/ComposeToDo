@@ -90,6 +90,7 @@ class SharedViewModel @Inject constructor(
 
     private fun addTask() {
         /** fields set in TaskScreen onTitle/Description/Priority Changed */
+        /** Use Dispatchers.IO for system input/output operations, for blocking operations */
         viewModelScope.launch(Dispatchers.IO) {
             val toDoTask = ToDoTask(
                 title = title.value,
@@ -126,12 +127,18 @@ class SharedViewModel @Inject constructor(
         }
     }
 
+    private fun deleteAllTasks() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllTasks()
+        }
+    }
+
     fun handleDatabaseActions(action: Action) {
         when(action) {
             Action.ADD -> addTask()
             Action.UPDATE -> updateTask()
             Action.DELETE -> deleteTask()
-            Action.DELETE_ALL -> {}
+            Action.DELETE_ALL -> deleteAllTasks()
             Action.UNDO -> addTask()
             else -> {}
         }
