@@ -56,6 +56,27 @@ class SharedViewModel @Inject constructor(
         }
     }
 
+    private val _searchedTasks =
+        MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+    val searchedTasks: StateFlow<RequestState<List<ToDoTask>>> = _searchedTasks
+
+    fun searchDatabase(searchQuery: String) {
+        _searchedTasks.value = RequestState.Loading
+        try {
+            viewModelScope.launch {
+                // SQL "like" needs % symbols, find value in any position
+                repository.searchDatabase(searchQuery = "%$searchQuery%")
+                    .collect { searchedTasks ->
+                        _searchedTasks.value = RequestState.Success(searchedTasks)
+                    }
+            }
+        } catch (e: Exception) {
+            _searchedTasks.value = RequestState.Error(e)
+        }
+        // trigger SearchAppBarState in ListScreen
+        searchAppBarState.value = SearchAppBarState.TRIGGERED
+    }
+
     private val _selectedTask: MutableStateFlow<ToDoTask?> = MutableStateFlow(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
 
@@ -69,6 +90,7 @@ class SharedViewModel @Inject constructor(
 
     private fun addTask() {
         /** fields set in TaskScreen onTitle/Description/Priority Changed */
+        /** Use Dispatchers.IO for system input/output operations, for blocking operations */
         viewModelScope.launch(Dispatchers.IO) {
             val toDoTask = ToDoTask(
                 title = title.value,
@@ -77,6 +99,8 @@ class SharedViewModel @Inject constructor(
             )
             repository.addTask(toDoTask)
         }
+        // force search close, trigger recomposition to show full list
+        searchAppBarState.value = SearchAppBarState.CLOSED
     }
 
     private fun updateTask() {
@@ -103,12 +127,18 @@ class SharedViewModel @Inject constructor(
         }
     }
 
+    private fun deleteAllTasks() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllTasks()
+        }
+    }
+
     fun handleDatabaseActions(action: Action) {
         when(action) {
             Action.ADD -> addTask()
             Action.UPDATE -> updateTask()
             Action.DELETE -> deleteTask()
-            Action.DELETE_ALL -> {}
+            Action.DELETE_ALL -> deleteAllTasks()
             Action.UNDO -> addTask()
             else -> {}
         }

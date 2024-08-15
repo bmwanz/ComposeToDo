@@ -47,6 +47,7 @@ fun ListScreen(
     // basically observing database
     // `by` to transfer state into list of ToDoTasks
     val allTasks by sharedViewModel.allTasks.collectAsState()
+    val searchedTasks by sharedViewModel.searchedTasks.collectAsState()
 
     // observe appBarState from sharedViewModel
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppBarState
@@ -80,7 +81,9 @@ fun ListScreen(
              */
             it
             ListContent(
-                tasks = allTasks,
+                allTasks = allTasks,
+                searchedTasks = searchedTasks,
+                searchAppBarState = searchAppBarState,
                 navigateToTaskScreen = navigateToTaskScreen
             )
         },
@@ -135,7 +138,7 @@ fun DisplaySnackBar(
         if (action != Action.NO_ACTION) {
             scope.launch {
                 val snackBarResult = scaffoldState.snackbarHostState.showSnackbar(
-                    message = "${action.name}: $taskTitle",
+                    message = setMessage(action, taskTitle),
                     actionLabel = setActionLabel(action)
                 )
                 undoDeletedTask(
@@ -145,6 +148,13 @@ fun DisplaySnackBar(
                 )
             }
         }
+    }
+}
+
+private fun setMessage(action: Action, taskTitle: String): String {
+    return when(action) {
+        Action.DELETE_ALL -> "All Tasks Removed"
+        else -> "${action.name}: $taskTitle"
     }
 }
 
