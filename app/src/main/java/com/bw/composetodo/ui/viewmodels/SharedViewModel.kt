@@ -56,6 +56,27 @@ class SharedViewModel @Inject constructor(
         }
     }
 
+    private val _searchedTasks =
+        MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+    val searchedTasks: StateFlow<RequestState<List<ToDoTask>>> = _searchedTasks
+
+    fun searchDatabase(searchQuery: String) {
+        _searchedTasks.value = RequestState.Loading
+        try {
+            viewModelScope.launch {
+                // SQL "like" needs % symbols, find value in any position
+                repository.searchDatabase(searchQuery = "%$searchQuery%")
+                    .collect { searchedTasks ->
+                        _searchedTasks.value = RequestState.Success(searchedTasks)
+                    }
+            }
+        } catch (e: Exception) {
+            _searchedTasks.value = RequestState.Error(e)
+        }
+        // trigger SearchAppBarState in ListScreen
+        searchAppBarState.value = SearchAppBarState.TRIGGERED
+    }
+
     private val _selectedTask: MutableStateFlow<ToDoTask?> = MutableStateFlow(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
 
@@ -77,6 +98,8 @@ class SharedViewModel @Inject constructor(
             )
             repository.addTask(toDoTask)
         }
+        // force search close, trigger recomposition to show full list
+        searchAppBarState.value = SearchAppBarState.CLOSED
     }
 
     private fun updateTask() {
